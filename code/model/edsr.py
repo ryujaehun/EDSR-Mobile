@@ -10,21 +10,21 @@ def make_model(args, parent=False):
         return EDSR(args)
 
 class EDSR(nn.Module):
-    def __init__(self, args, conv=common.default_conv):
+    def __init__(self, args, conv=common.SeparableConv):
         super(EDSR, self).__init__()
 
         n_resblock = args.n_resblocks
         n_feats = args.n_feats
-        kernel_size = 3 
+        kernel_size = 3
         scale = args.scale[0]
         act = nn.ReLU(True)
 
         rgb_mean = (0.4488, 0.4371, 0.4040)
         rgb_std = (1.0, 1.0, 1.0)
         self.sub_mean = common.MeanShift(args.rgb_range, rgb_mean, rgb_std)
-        
+
         # define head module
-        m_head = [conv(args.n_colors, n_feats, kernel_size)]
+        m_head = [common.default_conv(args.n_colors, n_feats, kernel_size)]
 
         # define body module
         m_body = [
@@ -59,7 +59,7 @@ class EDSR(nn.Module):
         x = self.tail(res)
         x = self.add_mean(x)
 
-        return x 
+        return x
 
     def load_state_dict(self, state_dict, strict=True):
         own_state = self.state_dict()
@@ -79,4 +79,3 @@ class EDSR(nn.Module):
                 if name.find('tail') == -1:
                     raise KeyError('unexpected key "{}" in state_dict'
                                    .format(name))
-
