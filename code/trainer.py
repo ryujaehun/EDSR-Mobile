@@ -1,7 +1,7 @@
 import os
 import math
 from decimal import Decimal
-
+import datetime
 import utility
 
 import torch
@@ -40,7 +40,7 @@ class Trainer():
         )
         self.loss.start_log()
         self.model.train()
-
+        acc=0
         timer_data, timer_model = utility.timer(), utility.timer()
         for batch, (lr, hr, _, idx_scale) in enumerate(self.loader_train):
             lr, hr = self.prepare(lr, hr)
@@ -61,17 +61,22 @@ class Trainer():
             timer_model.hold()
 
             if (batch + 1) % self.args.print_every == 0:
+                t1=timer_model.release()
+                t2=timer_data.release()
                 self.ckp.write_log('[{}/{}]\t{}\t{:.1f}+{:.1f}s'.format(
                     (batch + 1) * self.args.batch_size,
                     len(self.loader_train.dataset),
                     self.loss.display_loss(batch),
-                    timer_model.release(),
-                    timer_data.release()))
+                    t1,
+                    t2))
 
             timer_data.tic()
 
+
         self.loss.end_log(len(self.loader_train))
         self.error_last = self.loss.log[-1, -1]
+        print('traing finished ',str(datetime.timedelta(seconds=round(acc*self.args.epochs-epoch))),'left. {} epoch left.'.format(self.args.epochs-epoch))
+        acc=0
 
     def test(self):
         epoch = self.scheduler.last_epoch + 1
@@ -130,7 +135,7 @@ class Trainer():
         def _prepare(tensor):
             if self.args.precision == 'half': tensor = tensor.half()
             return tensor.to(device)
-           
+
         return [_prepare(a) for a in args]
 
     def terminate(self):
@@ -140,4 +145,3 @@ class Trainer():
         else:
             epoch = self.scheduler.last_epoch + 1
             return epoch >= self.args.epochs
-
