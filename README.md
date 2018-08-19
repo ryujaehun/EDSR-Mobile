@@ -4,7 +4,8 @@
 ![](https://i1.wp.com/deepmi.me/wp-content/uploads/2017/12/unnamed-file.jpeg)
 ## About
 This repository is the repository that applies the Depthwise Separable convolution to EDSR.
-
+The size of the feature map and the size of the residual block are significantly reduced to accommodate the number of parameters.
+Since the MSE loss is better than the L1 loss from the time when the parameter is reduced, MSE is adopted.
 ## Dependencies
 * Python (Tested with 3.6)
 * PyTorch >= 0.4.0
@@ -32,22 +33,25 @@ cd code       # You are now in */EDSR-PyTorch/code
 sh demo.sh
 ```
 
-You can find the result images from ```experiment/test/results``` folder.
 
-| Model | Scale | File name (.pt) | Parameters | ****PSNR** |
-|  ---  |  ---  | ---       | ---        | ---  |
-| **EDSR** | 2 | EDSR_baseline_x2 | 1.37 M | 34.61 dB |
-| | | *EDSR_x2 | 40.7 M | 35.03 dB |
-| | 3 | EDSR_baseline_x3 | 1.55 M | 30.92 dB |
-| | | *EDSR_x3 | 43.7 M | 31.26 dB |
-| | 4 | EDSR_baseline_x4 | 1.52 M | 28.95 dB |
-| | | *EDSR_x4 | 43.1 M | 29.25 dB |
-| **MDSR** | 2 | MDSR_baseline | 3.23 M | 34.63 dB |
-| | | *MDSR | 7.95 M| 34.92 dB |
-| | 3 | MDSR_baseline | | 30.94 dB |
-| | | *MDSR | | 31.22 dB |
-| | 4 | MDSR_baseline | | 28.97 dB |
-| | | *MDSR | | 29.24 dB |
+| Model | Scale | Dataset | Parameters |Loss | Filter | ResBlock |****PSNR** |
+|  ---  |  ---  | ---       | ---     | --- | ---    | --- |---  |
+| **EDSR** | 2 | Set5 | 3.5K | MSE | 8 | 2 | 36.119 dB |
+| **EDSR** | 2 | Set14 | 3.5K | MSE | 8 | 2 | 32.178 dB |
+| **EDSR** | 2 | B100 | 3.5K | MSE | 8 | 2 | 31.084 dB |
+| **EDSR** | 2 | Urban100 | 3.5K | MSE | 8 | 2 | 28.884 dB |
+| **EDSR** | 2 | Set5 | 3.5K | L1 | 8 | 2 | 35.222 dB |
+| **EDSR** | 2 | Set14 | 3.5K | L1 | 8 | 2 | 31.515 dB |
+| **EDSR** | 2 | B100 | 3.5K | L1 | 8 | 2 | 30.853 dB |
+| **EDSR** | 2 | Urban100 | 3.5K | L1 | 8 | 2 | 27.945 dB |
+| **EDSR** | 2 | Set5 | 62.1K | MSE | 32 | 8 | 37.19 dB |
+| **EDSR** | 2 | Set14 | 62.1K | MSE | 32 | 8 | 32.873 dB |
+| **EDSR** | 2 | B100 | 62.1K | MSE | 32 | 8 | 31.694 dB |
+| **EDSR** | 2 | Urban100 | 62.1K | MSE | 32 | 8 | 30.353 dB |
+| **EDSR** | 2 | Set5 | 62.1K | L1 | 32 | 8 | 37.246 dB |
+| **EDSR** | 2 | Set14 | 62.1K | L1 | 32 | 8 | 32.854 dB |
+| **EDSR** | 2 | B100 | 62.1K | L1 | 32 | 8 | 31.662 dB |
+| **EDSR** | 2 | Urban100 | 62.1K | L1 | 32 | 8 | 30.329 dB |
 
 *Baseline models are in ``experiment/model``. Please download our final models from [here](https://cv.snu.ac.kr/research/EDSR/model_pytorch.tar) (542MB)
 **We measured PSNR using DIV2K 0801 ~ 0900, RGB channels, without self-ensemble. (scale + 2) pixels from the image boundary are ignored.
